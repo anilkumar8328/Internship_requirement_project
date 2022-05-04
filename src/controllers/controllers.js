@@ -9,13 +9,13 @@ let createCollege = async (req, res) => {
         let name = req.body.name.trim()
         let fullName = req.body.fullName.trim()
         let logoLink = req.body.logoLink.trim()
-        if (Object.keys(req.body) == 0) return res.status(400).send({ status: false, message: "Body is required" })
+        if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Body is required" })
 
         if (name.length == 0) return res.status(400).send({ status: false, message: "College Name is Required" })
 
         const findName = await collegeModel.find({ name: name, isDeleted: false })
 
-        if (findName.length > 0) return res.status(401).send({ status: false, })
+        if (findName.length > 0) return res.status(401).send({ status: false, message: `${name} already exist` })
 
         if (fullName.length == 0) return res.status(400).send({ status: false, message: "College Full Name is Required" })
 
@@ -47,7 +47,7 @@ let createIntern = async (req, res) => {
         if (email.length == 0) return res.status(400).send({ status: false, message: "Email is Required" })
 
         let findData = await internModel.find({ email: email, isDeleted: false })
-        if (findData.length > 0) return res.status(404).send({ status: false, message: "Email Already Exist" })
+        if (findData.length > 0) return res.status(404).send({ status: false, message: `${email} Already Exist` })
 
         if (number.length == 0) return res.status(400).send({ status: false, message: "Mobile number is Required" })
 
@@ -57,11 +57,11 @@ let createIntern = async (req, res) => {
 
         let findNumber = await internModel.find({ mobile: number, isDeleted: false })
 
-        if (findNumber.length > 0) return res.status(404).send({ status: false, message: "Mobile Already Exist" })
+        if (findNumber.length > 0) return res.status(404).send({ status: false, message: `${number} Already Exist` })
 
 
         if (collegeId.length == 0) return res.status(400).send({ status: false, message: "College Id is Required" })
-        if (!mongoose.isValidObjectId(collegeId)) return res.status(400).send({ status: false, message: "invalid ObjectId" })
+        if (!mongoose.isValidObjectId(collegeId)) return res.status(400).send({ status: false, message: `${collegeId} is an invalid ObjectId` })
 
 
         let create = await internModel.create(data)
