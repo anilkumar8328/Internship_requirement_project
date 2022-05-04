@@ -22,5 +22,3 @@ app.listen(process.env.PORT || 3000, function () {
     console.log('Express app running on port ' + (process.env.PORT || 3000))
 });
 
-//hhhhhhhhhhhhhhh
-//mongodb+srv://project-1_G10:OCBfkRxYDJRMsStJ@cluster0.evjpk.mongodb.net/project-blogs
