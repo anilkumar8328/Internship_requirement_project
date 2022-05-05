@@ -45,6 +45,9 @@ let createIntern = async (req, res) => {
         if (name.length == 0) return res.status(400).send({ status: false, message: "Name is Required" })
 
         if (email.length == 0) return res.status(400).send({ status: false, message: "Email is Required" })
+        
+        let validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+        if (!validateEmail.test(email)) return res.status(400).send({ status: false, messsage: `${email} is not a valid emailId` })
 
         let findData = await internModel.find({ email: email, isDeleted: false })
         if (findData.length > 0) return res.status(404).send({ status: false, message: `${email} Already Exist` })
@@ -75,15 +78,15 @@ let createIntern = async (req, res) => {
 
 let getCollege = async (req, res) => {
     try {
-        let data = req.query
-        if (data.length == 0) return res.status(400).send({ status: false, message: "provide the College name" })
-        let findCollege = await collegeModel.find({ name: data.collegeName })
-        if (findCollege.length == 0) return res.status(404).send({ status: false, message: `${data.collegeName} doesn't exist` })
+        let data = req.query.collegeName
+        if (!data) return res.status(400).send({ status: false, message: "provide the College name" })
+        let findCollege = await collegeModel.find({ name: data })
+        if (findCollege.length == 0) return res.status(404).send({ status: false, message: `${data} doesn't exist` })
 
         let findIntern = await internModel.find({ collegeId: findCollege[0]._id }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
-        if (findIntern.length == 0) return res.status(404).send({ status: false, messsage: `No intern applied in ${data.collegeName}` })
+        if (findIntern.length == 0) return res.status(404).send({ status: false, messsage: `No intern applied in ${data}` })
 
-        res.status(200).send({ status: true, data: { name: data.collegeName, fullName: findCollege[0].fullName, logoLink: findCollege[0].logoLink, interests: findIntern } })
+        res.status(200).send({ status: true, data: { name: data, fullName: findCollege[0].fullName, logoLink: findCollege[0].logoLink, interests: findIntern } })
     } catch (error) {
         res.status(500).send({ status: false, message: error.message })
     }
