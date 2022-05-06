@@ -45,19 +45,19 @@ let createIntern = async (req, res) => {
         if (name.length == 0) return res.status(400).send({ status: false, message: "Name is Required" })
 
         if (email.length == 0) return res.status(400).send({ status: false, message: "Email is Required" })
-        
+        //validation
         let validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
         if (!validateEmail.test(email)) return res.status(400).send({ status: false, messsage: `${email} is not a valid emailId` })
-
+        //unique
         let findData = await internModel.find({ email: email, isDeleted: false })
         if (findData.length > 0) return res.status(404).send({ status: false, message: `${email} Already Exist` })
 
         if (number.length == 0) return res.status(400).send({ status: false, message: "Mobile number is Required" })
-
+        //validation
         let validateMobile = /^(\+\d{1,3}[- ]?)?\d{10}$/
 
         if (!validateMobile.test(number)) return res.status(400).send({ status: false, messsage: "Number must be Numeric and valid" })
-
+        //unique
         let findNumber = await internModel.find({ mobile: number, isDeleted: false })
 
         if (findNumber.length > 0) return res.status(404).send({ status: false, message: `${number} Already Exist` })

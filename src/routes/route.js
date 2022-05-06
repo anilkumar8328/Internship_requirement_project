@@ -10,8 +10,10 @@ router.get("/test-me", function (req, res) {
 
 // create colleges
 router.post("/functionup/colleges", controllers.createCollege)
+
 // create interns
 router.post("/functionup/Interns", controllers.createIntern)
+
 //get all collegedetails
 router.get("/functionup/collegeDetails", controllers.getCollege)
 
@@ -24,6 +26,5 @@ router.all("/**", function (req, res) {
         msg: "The api you request is not available"
     })
 })
-
 
 module.exports = router;
