@@ -97,7 +97,7 @@ let createIntern = async (req, res) => {
         let createData = { name, mobile, email, collegeId }
 
         let create = await internModel.create(createData)
-        res.status(201).send({ status: true, data: createData })
+        res.status(201).send({ status: true, data: create })
 
     } catch (error) {
         console.log(error)
@@ -110,8 +110,12 @@ let getCollege = async (req, res) => {
     try {
         let data = req.query.collegeName
         if (!data) return res.status(400).send({ status: false, message: "provide the College name" })
+
         let findCollege = await collegeModel.find({ name: data })
+
         if (findCollege.length == 0) return res.status(404).send({ status: false, message: `${data} doesn't exist` })
+
+        if(findCollege[0].isDeleted == true) return res.status(404).send({status : false, message : `${data} is already deleted`})
 
         let findIntern = await internModel.find({ collegeId: findCollege[0]._id }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
         if (findIntern.length == 0) return res.status(404).send({ status: false, messsage: `No intern applied in ${data}` })
