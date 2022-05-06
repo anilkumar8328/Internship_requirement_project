@@ -12,7 +12,7 @@ let createCollege = async (req, res) => {
     //    const {name} = data
         if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Body is required" })
 
-        if (name.length == 0) return res.status(400).send({ status: false, message: "College Name is Required" })
+        if (!name || name.length == 0) return res.status(400).send({ status: false, message: "College Name is Required" })
 
         let validateName = /^[a-zA-Z.]+$/
         
@@ -24,15 +24,15 @@ let createCollege = async (req, res) => {
 
         if (findName.length > 0) return res.status(401).send({ status: false, message: `${name} already exist` })
 
-        if (fullName.length == 0) return res.status(400).send({ status: false, message: "College Full Name is Required" })
+        if (!fullName || fullName.length == 0) return res.status(400).send({ status: false, message: "College Full Name is Required" })
 
         let validateFullName = /^[A-Za-z\s]{1,}[\,]{0,1}[A-Za-z\s]{0,}$/
 
         if(!validateFullName.test(fullName)) return res.status(400).send({status: false, message :`${fullName} is not a valid FullName`})
 
-        if (logoLink.length == 0) return res.status(400).send({ status: false, message: "logo is Required" })
+        if (!logoLink || logoLink.length == 0) return res.status(400).send({ status: false, message: "logo is Required" })
 
-        let validateLogoLink = /(:?^((https|http|HTTP|HTTPS){1}:\/\/)(([w]{3})[\.]{1})?([a-zA-Z0-9]{1,}[\.])[\w]((\/){1}([\w@?^=%&amp;~+#-_.]+)))$/
+        let validateLogoLink = /^(http(s)?:\/\/)?(www.)?([a-zA-Z0-9])+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,5}(:[0-9]{1,5})?(\/[^\s]*)?$/gm
 
         if(!validateLogoLink.test(logoLink)) return res.status(400).send({status : false, message : `${logoLink} is not a valid logoLink`})
 
@@ -52,56 +52,52 @@ let createCollege = async (req, res) => {
 let createIntern = async (req, res) => {
     try {
         let data = req.body
-        let number = req.body.mobile
+        let mobile = req.body.mobile
         let email = req.body.email
         let name = req.body.name
-        let collegeId = req.body.collegeId
         let collegeName = req.body.collegeName
 
         if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Body is required" })
 
-        if(collegeName.length == 0) return res.status(400).send({status :false, message : "College Name is required"})
+        if(!collegeName || collegeName.length == 0) return res.status(400).send({status :false, message : "College Name is required"})
 
         let findCollege = await collegeModel.find({name : collegeName})
 
         if(findCollege.length == 0) res.status(404).send({status: false, message: `${collegeName} doesn't exist`})
 
-        if(findCollege[0]._id != collegeId) res.status(400).send({status : false, messsage : `${collegeId} is not the College ID of ${collegeName}`})
+        let collegeId = findCollege[0]._id
 
         delete data.collegeName
 
-        if (name.length == 0) return res.status(400).send({ status: false, message: "Name is Required" })
+        if (! name || name.length == 0) return res.status(400).send({ status: false, message: "Name is Required" })
 
-        let nameValidate = /^[A-z]$|^[A-z]+\s[A-z]$/
+        let nameValidate = /^[A-z]*$|^[A-z]+\s[A-z]*$/
 
         if(!nameValidate.test(name)) return res.status(400).send({status: false, message :`${name} is not a valid name`})
 
 
-        if (email.length == 0) return res.status(400).send({ status: false, message: "Email is Required" })
+        if (!email || email.length == 0) return res.status(400).send({ status: false, message: "Email is Required" })
         
-        let validateEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/
+        let validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
         if (!validateEmail.test(email)) return res.status(400).send({ status: false, messsage: `${email} is not a valid emailId` })
 
         let findData = await internModel.find({ email: email, isDeleted: false })
         if (findData.length > 0) return res.status(404).send({ status: false, message: `${email} Already Exist` })
 
-        if (number.length == 0) return res.status(400).send({ status: false, message: "Mobile number is Required" })
+        if (!mobile || mobile.length == 0) return res.status(400).send({ status: false, message: "Mobile number is Required" })
 
         let validateMobile = /^(\+\d{1,3}[- ]?)?\d{10}$/
 
-        if (!validateMobile.test(number)) return res.status(400).send({ status: false, messsage: "Number must be Numeric and valid" })
+        if (!validateMobile.test(mobile)) return res.status(400).send({ status: false, messsage: "Number must be Numeric and valid" })
 
-        let findNumber = await internModel.find({ mobile: number, isDeleted: false })
+        let findNumber = await internModel.find({ mobile: mobile, isDeleted: false })
 
-        if (findNumber.length > 0) return res.status(404).send({ status: false, message: `${number} Already Exist` })
+        if (findNumber.length > 0) return res.status(404).send({ status: false, message: `${mobile} Already Exist` })
 
+        let createData = { name, mobile, email, collegeId }
 
-        if (collegeId.length == 0) return res.status(400).send({ status: false, message: "College Id is Required" })
-        if (!mongoose.isValidObjectId(collegeId)) return res.status(400).send({ status: false, message: `${collegeId} is an invalid ObjectId` })
-
-
-        let create = await internModel.create(data)
-        res.status(201).send({ status: true, data: create })
+        let create = await internModel.create(createData)
+        res.status(201).send({ status: true, data: createData })
 
     } catch (error) {
         console.log(error)
