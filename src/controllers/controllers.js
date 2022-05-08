@@ -63,7 +63,7 @@ let createIntern = async (req, res) => {
 
         let findCollege = await collegeModel.find({name : collegeName})
 
-        if(findCollege.length == 0) res.status(404).send({status: false, message: `${collegeName} doesn't exist`})
+        if(findCollege.length == 0) return res.status(404).send({status: false, message: `${collegeName} doesn't exist`})
 
         let collegeId = findCollege[0]._id
 
@@ -111,7 +111,7 @@ let getCollege = async (req, res) => {
         let data = req.query.collegeName
         if (!data) return res.status(400).send({ status: false, message: "provide the College name" })
 
-        let findCollege = await collegeModel.find({ name: data })
+        let findCollege = await collegeModel.find({ name: data, isDeleted : false })
 
         if (findCollege.length == 0) return res.status(404).send({ status: false, message: `${data} doesn't exist` })
 
